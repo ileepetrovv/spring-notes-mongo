@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+
+  mongodb:
+    image: mongo:5.0
+    container_name: notes-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: notesdb
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - notes-network
+
+
+  app:
+    build: .
+    container_name: notes-app
+    restart: unless-stopped
+    environment:
+      SPRING_DATA_MONGODB_HOST: mongodb
+      SPRING_DATA_MONGODB_PORT: 27017
+      SPRING_DATA_MONGODB_DATABASE: notesdb
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongodb
+    volumes:
+      - ./frontend:/app/frontend
+    networks:
+      - notes-network
+
+
+volumes:
+  mongodb_data:
+
+
+networks:
+  notes-network:
+    driver: bridge
