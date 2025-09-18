@@ -1,17 +1,23 @@
+const username = process.env.MONGO_USERNAME || 'notesuser';
+const password = process.env.MONGO_PASSWORD || 'notespwd';
+const database = process.env.MONGO_INITDB_DATABASE || 'notesdb';
+
 // init-mongo.js
 db.createUser({
-    user: 'notesuser',
-    pwd: 'notespwd',
+    user: username,
+    pwd: password,
     roles: [
         {
             role: 'readWrite',
-            db: 'notesdb'
+            db: database
         }
     ]
 });
 
-// Креирај колекција и внеси тестови податоци ако сакаш (опционално)
+
+db = db.getSiblingDB(database);
+
 db.notes.insertOne({
-    text: "Welcome to Notes App!",
+    text: "Welcome to Notes App with Environment Variables!",
     createdAt: new Date()
 });
